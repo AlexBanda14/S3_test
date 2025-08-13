@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${ACCESSKEYID}
+      MINIO_ROOT_PASSWORD: ${SECRETACCESSKEY}
+    env_file:
+      - .env
+    command: server /data --console-address ":9001"
+    restart: unless-stopped
+
+  app:
+    build: .
+    container_name: s3_app
+    depends_on:
+      - minio
+    env_file:
+      - .env
+    restart: unless-stopped
